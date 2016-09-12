@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.Framework.Configuration;
-using Microsoft.Framework.OptionsModel;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,7 +20,7 @@ namespace ApiPort.CommandLine
             var arrays = GetConfigMapCounts(typeof(TOptions), t => (t.GetTypeInfo().IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>)) || t.IsArray, switchMapping);
             var updatedArgs = TransformArguments(args, arrays, booleanSwitches).ToArray();
 
-            var cmd = new ConfigurationBuilder(Directory.GetCurrentDirectory())
+            var cmd = new ConfigurationBuilder()
                  .AddCommandLine(updatedArgs, switchMapping)
                  .Build();
 

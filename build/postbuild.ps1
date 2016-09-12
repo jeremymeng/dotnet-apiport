@@ -44,6 +44,8 @@ foreach($nuspec in $nuspecs)
 	$nuspecData.package.metadata.version = "$version"
 	$nuspecData.Save($nuspecName)
 
+	Write-Host "Packing $($nuspec.Name).$version..."
+
 	[string]$output = & $nuget pack
 	
 	if($output -Match "Attempting to build package from '(.*)'. Successfully created package '(.*)'.")
