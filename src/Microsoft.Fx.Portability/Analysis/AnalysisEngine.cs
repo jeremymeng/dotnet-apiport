@@ -130,7 +130,7 @@ namespace Microsoft.Fx.Portability.Analysis
             //  -- Keep only the members that are not supported on at least one of the targets.
 
             var missingMembers = dependencies.Keys
-                .Where(m => MemberIsInFramework(m, submittedAssemblies))
+                .Where(m => MemberIsInFramework(m, submittedAssemblies) || MemberIsInKnownThirdPartyLibrary(m, submittedAssemblies))
                 .AsParallel()
                 .Select(memberInfo => ProcessMemberInfo(_catalog, targets, memberInfo))
                 .Where(memberInfo => !memberInfo.IsSupportedAcrossTargets)
@@ -154,6 +154,11 @@ namespace Microsoft.Fx.Portability.Analysis
             // For non-primitive types, consult the catalog to determine whether the
             // assembly and API in question are part of the Framework.
             return (dep.DefinedInAssemblyIdentity == null) || (_catalog.IsFrameworkAssembly(GetAssemblyIdentityWithoutCultureAndVersion(dep.DefinedInAssemblyIdentity)) && _catalog.IsFrameworkMember(dep.MemberDocId));
+        }
+
+        private bool MemberIsInKnownThirdPartyLibrary(MemberInfo m, ICollection<string> submittedAssemblies)
+        {
+            return true;
         }
 
         /// <summary>

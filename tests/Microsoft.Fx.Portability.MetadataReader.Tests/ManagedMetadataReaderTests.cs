@@ -228,6 +228,11 @@ namespace Microsoft.Fx.Portability.MetadataReader.Tests
             {
                 return string.Equals(_assemblyName, assembly?.Name);
             }
+
+            public bool IsKnownThirdPartyAssembly(AssemblyReferenceInformation assembly)
+            {
+                return false;
+            }
         }
     }
 }

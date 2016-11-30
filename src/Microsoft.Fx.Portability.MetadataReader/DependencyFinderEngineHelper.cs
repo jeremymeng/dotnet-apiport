@@ -107,7 +107,7 @@ namespace Microsoft.Fx.Portability.Analyzer
             var definedInAssembly = type.DefinedInAssembly.HasValue ? _reader.FormatAssemblyInfo(type.DefinedInAssembly.Value) : _currentAssemblyInfo;
 
             // Apply heuristic to determine if API is most likely defined in a framework assembly
-            if (!_assemblyFilter.IsFrameworkAssembly(definedInAssembly))
+            if (!_assemblyFilter.IsFrameworkAssembly(definedInAssembly) && !_assemblyFilter.IsKnownThirdPartyAssembly(definedInAssembly))
             {
                 return null;
             }
@@ -138,7 +138,7 @@ namespace Microsoft.Fx.Portability.Analyzer
             }
 
             // Apply heuristic to determine if API is most likely defined in a framework assembly
-            if (!_assemblyFilter.IsFrameworkAssembly(definedInAssemblyIdentity))
+            if (!_assemblyFilter.IsFrameworkAssembly(definedInAssemblyIdentity) && !_assemblyFilter.IsKnownThirdPartyAssembly(definedInAssemblyIdentity))
             {
                 return null;
             }

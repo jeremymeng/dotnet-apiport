@@ -59,5 +59,10 @@ namespace Microsoft.Fx.Portability.Analyzer
 
             return false;
         }
+
+        public bool IsKnownThirdPartyAssembly(AssemblyReferenceInformation assembly)
+        {
+            return false;
+        }
     }
 }
