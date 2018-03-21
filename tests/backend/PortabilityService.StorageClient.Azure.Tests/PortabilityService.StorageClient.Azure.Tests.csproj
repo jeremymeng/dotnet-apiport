@@ -1,23 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+
     <IsPackable>false</IsPackable>
+
+    <RootNamespace>PortabilityService.StorageClient.Azure.Tests</RootNamespace>
+
+    <AssemblyName>PortabilityService.StorageClient.Azure.Tests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
-    <PackageReference Include="NSubstitute" Version="3.1.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.6.0" />
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\backend\Functions\Functions.csproj" />
     <ProjectReference Include="..\..\..\src\backend\PortabilityService.StorageClient.Azure\PortabilityService.StorageClient.Azure.csproj" />
-    <ProjectReference Include="..\..\..\src\backend\WorkflowManagement\WorkflowManagement.csproj" />
-    <EmbeddedResource Include="Resources\**\*" />
   </ItemGroup>
 
 </Project>

@@ -11,6 +11,7 @@ using WorkflowManagement;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using Microsoft.Azure.WebJobs;
+using System.IO;
 
 namespace Functions.Tests
 {
@@ -30,14 +31,10 @@ namespace Functions.Tests
         [Fact]
         public static async Task ReturnsGuidForCompressedAnalyzeRequest()
         {
-            var gzippedAnalyzeRequest = typeof(AnalyzeTests).Assembly
+            var gzippedAnalyzeRequestStream = typeof(AnalyzeTests).Assembly
                 .GetManifestResourceStream("Functions.Tests.Resources.apiport.exe.AnalyzeRequest.json.gz");
 
-            var request = PostFromConsoleApiPort;
-            request.SetConfiguration(new HttpConfiguration());
-            request.Content = new StreamContent(gzippedAnalyzeRequest);
-            request.Content.Headers.Add("Content-Encoding", "gzip");
-            request.Content.Headers.Add("Content-Type", "application/json");
+            var request = GetGzipppedPostRequest(gzippedAnalyzeRequestStream);
 
             WorkflowManager.Initialize();
             var workflowQueue = Substitute.For<ICollector<WorkflowQueueMessage>>();
@@ -49,19 +46,46 @@ namespace Functions.Tests
             workflowQueue.Received().Add(Arg.Is<WorkflowQueueMessage>(x => x.SubmissionId == submissionId.ToString() && x.Stage == WorkflowStage.Analyze));
         }
 
+        [Fact]
+        public static async Task SavesAnalyzeRequest()
+        {
+            var gzippedAnalyzeRequestStream = typeof(AnalyzeTests).Assembly
+                .GetManifestResourceStream("Functions.Tests.Resources.apiport.exe.AnalyzeRequest.json.gz");
+
+            var expectedStream = new MemoryStream();
+            gzippedAnalyzeRequestStream.CopyTo(expectedStream);
+            gzippedAnalyzeRequestStream.Seek(0, SeekOrigin.Begin);
+
+            var gzippedRequest = GetGzipppedPostRequest(gzippedAnalyzeRequestStream);
+
+            WorkflowManager.Initialize();
+            var workflowQueue = Substitute.For<ICollector<WorkflowQueueMessage>>();
+            var response = await Analyze.Run(gzippedRequest, workflowQueue, NullLogger.Instance);
+        }
+
         private static HttpRequestMessage PostFromConsoleApiPort
         {
             get
             {
-                var req = new HttpRequestMessage(HttpMethod.Post, "");
-                req.Headers.Add("Accept", "application/json");
-                req.Headers.Add("Accept-Encoding", "gzip, deflate");
-                req.Headers.Add("Client-Type", "ApiPort_Console");
-                req.Headers.Add("Client-Version", "2.4.0.2");
-                req.Headers.Add("Expect", "100-continue");
+                var request = new HttpRequestMessage(HttpMethod.Post, "");
+                request.Headers.Add("Accept", "application/json");
+                request.Headers.Add("Accept-Encoding", "gzip, deflate");
+                request.Headers.Add("Client-Type", "ApiPort_Console");
+                request.Headers.Add("Client-Version", "2.4.0.2");
+                request.Headers.Add("Expect", "100-continue");
 
-                return req;
+                return request;
             }
+        }
+
+        private static HttpRequestMessage GetGzipppedPostRequest(Stream content)
+        {
+            var request = PostFromConsoleApiPort;
+            request.SetConfiguration(new HttpConfiguration());
+            request.Content = new StreamContent(content);
+            request.Content.Headers.Add("Content-Encoding", "gzip");
+            request.Content.Headers.Add("Content-Type", "application/json");
+            return request;
         }
     }
 }
