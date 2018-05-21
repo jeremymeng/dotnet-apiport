@@ -9,7 +9,7 @@ using Microsoft.Fx.Portability.Azure.Storage;
 using Microsoft.Fx.Portability.ObjectModel;
 using Microsoft.WindowsAzure.Storage;
 
-namespace PortabilityService.AnalysisEngine
+namespace PortabilityService.AnalysisService
 {
     public class Startup
     {
