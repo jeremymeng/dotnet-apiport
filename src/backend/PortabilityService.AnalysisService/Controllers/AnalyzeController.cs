@@ -16,20 +16,17 @@ namespace PortabilityService.AnalysisService.Controllers
     {
         private readonly ILogger<AnalyzeController> _logger;
         private readonly IConfiguration _configuration;
-        //TODO: inject
-        //private readonly IRequestAnalyzer _requestAnalyzer;
+        private readonly IRequestAnalyzer _requestAnalyzer;
         private readonly IStorage _storage;
 
         public AnalyzeController(
             IConfiguration configuration,
-            //TODO: inject
-            //IRequestAnalyzer requestAnalyzer,
+            IRequestAnalyzer requestAnalyzer,
             IStorage storage,
             ILogger<AnalyzeController> logger)
         {
             _configuration = configuration;
-            //TODO: inject
-            //_requestAnalyzer = requestAnalyzer;
+            _requestAnalyzer = requestAnalyzer;
             _storage = storage;
             _logger = logger;
         }
@@ -55,7 +52,7 @@ namespace PortabilityService.AnalysisService.Controllers
                     return NotFound();
                 }
 
-                var result = await AnalyzeRequestAsync(request, submissionId);
+                var result = AnalyzeRequest(request, submissionId);
 
                 await _storage.SaveResultToBlobAsync(submissionId, result);
 
@@ -74,7 +71,7 @@ namespace PortabilityService.AnalysisService.Controllers
             }
         }
 
-        private Task<AnalyzeResult> AnalyzeRequestAsync(AnalyzeRequest analyzeRequest, string submissionId)
+        private AnalyzeResult AnalyzeRequest(AnalyzeRequest analyzeRequest, string submissionId)
         {
             using (_logger.BeginScope($"Analyzing request for {submissionId}"))
             {
@@ -86,28 +83,7 @@ namespace PortabilityService.AnalysisService.Controllers
                     analyzeRequest.RequestFlags |= AnalyzeRequestFlags.ShowNonPortableApis;
                 }
 
-                //TODO: invoke the real analysis engine to do the work
-                //return _requestAnalyzer.AnalyzeRequest(analyzeRequest, submissionId);
-
-                return Task.FromResult(new AnalyzeResult
-                {
-                    MissingDependencies = new System.Collections.Generic.List<MemberInfo>
-                    {
-                        new MemberInfo { MemberDocId = "doc1" },
-                        new MemberInfo { MemberDocId = "doc2" }
-                    },
-                    SubmissionId = Guid.NewGuid().ToString(),
-                    Targets = new System.Collections.Generic.List<System.Runtime.Versioning.FrameworkName>
-                    {
-                        new System.Runtime.Versioning.FrameworkName("target1", Version.Parse("1.0.0.0"))
-                    },
-                    UnresolvedUserAssemblies = new System.Collections.Generic.List<string>
-                    {
-                        "assembly1",
-                        "assembly2",
-                        "assembly3"
-                    }
-                });
+                return _requestAnalyzer.AnalyzeRequest(analyzeRequest, submissionId);
             }
         }
     }
